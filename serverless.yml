@@ -1,0 +1,45 @@
+custom:
+  BACKUP_BUCKET: data-dog-backups
+  DATA_DOG_API_KEY: 'your-api-key'    # TODO move to SM 
+  DATA_DOG_APP_KEY: 'your-app-key'    # TODO move to SM
+
+service:
+  name: datadog-backup
+
+plugins:
+  - serverless-offline
+  - serverless-offline-scheduler
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: ap-southeast-2
+  environment:
+    BACKUP_BUCKET: ${self:custom.BACKUP_BUCKET}
+    DATA_DOG_API_KEY: ${self:custom.DATA_DOG_API_KEY}
+    DATA_DOG_APP_KEY: ${self:custom.DATA_DOG_APP_KEY}
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 's3:PutObject'
+      Resource: 'arn:aws:s3:::${self:custom.BACKUP_BUCKET}/*'
+
+functions:
+  runBackup:
+    handler: index.runBackup
+    events:
+      - schedule: rate(24 hours)
+
+resources:
+  Resources:
+    BackupBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.BACKUP_BUCKET}
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteRule
+              Status: Enabled
+              ExpirationInDays: 30
+      DeletionPolicy: Retain
+

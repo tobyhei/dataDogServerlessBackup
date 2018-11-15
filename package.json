@@ -1,0 +1,17 @@
+{
+  "name": "dd-backup",
+  "version": "1.0.0",
+  "description": "Backup datadog boards and monitors to s3.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.356.0",
+    "node-fetch": "^2.3.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^3.31.3",
+    "serverless-offline-scheduler": "^0.3.5"
+  }
+}
